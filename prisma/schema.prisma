@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  name            String
+  email           String   @unique
+  password        String
+  phone           String?
+  referralCode    String   @unique
+  referredBy      String?
+  role            String   @default("user")
+  status          String   @default("pending")
+  walletBalance   Float    @default(0)
+  graphBalance    Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sentTransfers     Transfer[] @relation("SenderTransfers")
+  receivedTransfers Transfer[] @relation("ReceiverTransfers")
+  balanceHistory    BalanceHistory[]
+}
+
+model Transfer {
+  id          String   @id @default(cuid())
+  senderId    String
+  receiverId  String
+  amount      Float
+  tax         Float    @default(0)
+  netAmount   Float
+  note        String?
+  createdAt   DateTime @default(now())
+
+  sender   User @relation("SenderTransfers", fields: [senderId], references: [id])
+  receiver User @relation("ReceiverTransfers", fields: [receiverId], references: [id])
+}
+
+model BalanceHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  balance   Float
+  type      String
+  note      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model GlobalSettings {
+  id                  String  @id @default(cuid())
+  taxEnabled          Boolean @default(false)
+  taxPercentage       Float   @default(0)
+  referralReward      Float   @default(0)
+  registrationBonus   Float   @default(100)
+  updatedAt           DateTime @updatedAt
+}
