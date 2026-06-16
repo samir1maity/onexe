@@ -39,7 +39,7 @@ export async function getAuthUser(): Promise<JWTPayload | null> {
 }
 
 export function generateUserId(): string {
-  const prefix = 'ONX'
+  const prefix = 'ONXE'
   const num = Math.floor(100000 + Math.random() * 900000)
   return `${prefix}${num}`
 }

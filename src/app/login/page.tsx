@@ -52,7 +52,7 @@ export default function LoginPage() {
                style={{ boxShadow: '0 0 30px rgba(59,130,246,0.4)' }}>
             <TrendingUp className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold gradient-text">OneX</h1>
+          <h1 className="text-3xl font-bold gradient-text">Onexe</h1>
           <p className="text-gray-400 text-sm mt-1">Smart Trading Platform</p>
         </div>
 
@@ -73,7 +73,7 @@ export default function LoginPage() {
               <input
                 type="text"
                 className="input-dark"
-                placeholder="e.g. ONX123456"
+                placeholder="e.g. ONXE123456"
                 value={form.userId}
                 onChange={(e) => setForm({ ...form, userId: e.target.value })}
                 required
@@ -119,7 +119,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-gray-600 mt-6">
-          © {new Date().getFullYear()} OneX. All rights reserved.
+          © {new Date().getFullYear()} Onexe. All rights reserved.
         </p>
       </div>
     </div>

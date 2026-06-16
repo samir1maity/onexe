@@ -28,10 +28,15 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #2d4a6e; }
 
 .glass-card {
-  background: rgba(17, 24, 39, 0.8);
-  backdrop-filter: blur(20px);
+  background: rgba(17, 24, 39, 0.92);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(30, 45, 61, 0.6);
   border-radius: 16px;
+  /* Promote to its own GPU layer so mounting an overlay above it
+     (e.g. a modal) doesn't force the browser to recomposite every
+     blurred card on screen at once. */
+  will-change: backdrop-filter;
+  transform: translateZ(0);
 }
 
 .gradient-text {

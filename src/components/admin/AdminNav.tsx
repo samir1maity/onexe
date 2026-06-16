@@ -27,7 +27,7 @@ export default function AdminNav({ user }: Props) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/5"
-      style={{ background: 'rgba(10, 14, 26, 0.9)', backdropFilter: 'blur(20px)' }}>
+      style={{ background: 'rgba(10, 14, 26, 0.95)', backdropFilter: 'blur(10px)', willChange: 'backdrop-filter' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
@@ -35,7 +35,7 @@ export default function AdminNav({ user }: Props) {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-lg gradient-text">OneX</span>
+              <span className="font-bold text-lg gradient-text">Onexe</span>
             </Link>
             <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 font-medium">Admin</span>
           </div>

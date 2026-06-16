@@ -49,7 +49,7 @@ export default function TransferModal({ walletBalance, onClose, onSuccess }: Pro
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-         style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+         style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
          onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="glass-card w-full max-w-md fade-in" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between p-5 border-b border-white/5">

@@ -91,13 +91,13 @@ function RegisterForm() {
              style={{ boxShadow: '0 0 25px rgba(59,130,246,0.4)' }}>
           <TrendingUp className="w-7 h-7 text-white" />
         </div>
-        <h1 className="text-2xl font-bold gradient-text">OneX</h1>
+        <h1 className="text-2xl font-bold gradient-text">Onexe</h1>
         <p className="text-gray-400 text-xs mt-1">Create your trading account</p>
       </div>
 
       <div className="glass-card p-6 sm:p-8">
         <h2 className="text-lg font-semibold text-white mb-1">Create Account</h2>
-        <p className="text-gray-400 text-sm mb-5">Join OneX today</p>
+        <p className="text-gray-400 text-sm mb-5">Join Onexe today</p>
 
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
@@ -226,7 +226,7 @@ function RegisterForm() {
       </div>
 
       <p className="text-center text-xs text-gray-600 mt-5">
-        © {new Date().getFullYear()} OneX. All rights reserved.
+        © {new Date().getFullYear()} Onexe. All rights reserved.
       </p>
     </div>
   )
