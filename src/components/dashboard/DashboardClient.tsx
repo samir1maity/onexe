@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Users, TrendingUp, TrendingDown, Copy, CheckCheck, Wallet, ArrowUpRight, ArrowDownLeft, RefreshCw } from 'lucide-react'
 import TradingGraph from './TradingGraph'
 import TransferModal from './TransferModal'
@@ -50,6 +50,13 @@ interface Props {
 }
 
 export default function DashboardClient({ user, balanceHistory, transfers, referrals, teamNumber }: Props) {
+  const greeting = useMemo(() => {
+    const h = new Date().getHours()
+    if (h < 12) return 'Good morning'
+    if (h < 17) return 'Good afternoon'
+    return 'Good evening'
+  }, [])
+
   const [copied, setCopied] = useState(false)
   const [showTransferModal, setShowTransferModal] = useState(false)
   const [transferType, setTransferType] = useState<'bank' | 'user'>('user')
@@ -76,7 +83,7 @@ export default function DashboardClient({ user, balanceHistory, transfers, refer
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">
-            Good day, <span className="gradient-text">{user.name.split(' ')[0]}</span> 👋
+            {greeting}, <span className="gradient-text">{user.name.split(' ')[0]}</span> 👋
           </h1>
           <p className="text-gray-400 text-sm mt-0.5">Your portfolio overview</p>
         </div>
