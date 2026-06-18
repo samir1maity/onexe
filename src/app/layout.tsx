@@ -4,6 +4,11 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Onexe — Trading Platform',
   description: 'Modern investment and trading platform',
+  icons: {
+    icon: '/ONEXE-logo-TM.png',
+    shortcut: '/ONEXE-logo-TM.png',
+    apple: '/ONEXE-logo-TM.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

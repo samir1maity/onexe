@@ -1,5 +1,8 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import moment from 'moment-timezone'
+
+export const IST_TIMEZONE = 'Asia/Kolkata'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -15,19 +18,9 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatDate(date: Date | string): string {
-  return new Intl.DateTimeFormat('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(date))
+  return moment(date).tz(IST_TIMEZONE).format('DD MMM YYYY, hh:mm A')
 }
 
 export function formatDateShort(date: Date | string): string {
-  return new Intl.DateTimeFormat('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(date))
+  return moment(date).tz(IST_TIMEZONE).format('DD MMM YYYY')
 }

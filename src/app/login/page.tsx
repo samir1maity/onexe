@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Eye, EyeOff, TrendingUp, Loader2 } from 'lucide-react'
+import Image from 'next/image'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -48,12 +49,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md fade-in">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center mb-4 glow-blue"
-               style={{ boxShadow: '0 0 30px rgba(59,130,246,0.4)' }}>
-            <TrendingUp className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold gradient-text">Onexe</h1>
-          <p className="text-gray-400 text-sm mt-1">Smart Trading Platform</p>
+          <Image src="/ONEXE-logo.png" alt="Onexe" width={200} height={67} className="object-contain" />
+          <p className="text-gray-400 text-sm mt-2">Smart Trading Platform</p>
         </div>
 
         {/* Card */}

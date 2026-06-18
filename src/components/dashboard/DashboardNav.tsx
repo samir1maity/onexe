@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { TrendingUp, Menu, X, LogOut, LayoutDashboard, ArrowLeftRight, User } from 'lucide-react'
+import Image from 'next/image'
+import { Menu, X, LogOut, LayoutDashboard, ArrowLeftRight, User } from 'lucide-react'
 import type { JWTPayload } from '@/lib/auth'
 
 interface Props {
@@ -32,11 +33,8 @@ export default function DashboardNav({ user }: Props) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-lg gradient-text">Onexe</span>
+          <Link href="/dashboard" className="flex items-center">
+            <Image src="/ONEXE-logo.png" alt="Onexe" width={120} height={40} className="object-contain" />
           </Link>
 
           {/* Desktop Nav */}

@@ -10,7 +10,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { formatCurrency } from '@/lib/utils'
+import moment from 'moment-timezone'
+import { formatCurrency, IST_TIMEZONE } from '@/lib/utils'
 
 interface HistoryItem {
   id: string
@@ -40,15 +41,11 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 export default function TradingGraph({ history, currentBalance }: Props) {
   const data = useMemo(() => {
     if (history.length === 0) {
-      const now = new Date()
-      return Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(now)
-        d.setDate(d.getDate() - (6 - i))
-        return {
-          date: d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
-          balance: 0,
-        }
-      })
+      const now = moment().tz(IST_TIMEZONE)
+      return Array.from({ length: 7 }, (_, i) => ({
+        date: now.clone().subtract(6 - i, 'days').format('MMM D'),
+        balance: 0,
+      }))
     }
 
     const graphHistory = history.filter(
@@ -56,25 +53,21 @@ export default function TradingGraph({ history, currentBalance }: Props) {
     )
 
     if (graphHistory.length === 0) {
-      const now = new Date()
-      const points = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(now)
-        d.setDate(d.getDate() - (6 - i))
-        return {
-          date: d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
-          balance: i === 6 ? currentBalance : 0,
-        }
-      })
+      const now = moment().tz(IST_TIMEZONE)
+      const points = Array.from({ length: 7 }, (_, i) => ({
+        date: now.clone().subtract(6 - i, 'days').format('MMM D'),
+        balance: i === 6 ? currentBalance : 0,
+      }))
       return points
     }
 
     const points = graphHistory.map((h) => ({
-      date: new Date(h.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      date: moment(h.createdAt).tz(IST_TIMEZONE).format('MMM D, hh:mm A'),
       balance: h.balance,
     }))
 
     points.push({
-      date: new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      date: moment().tz(IST_TIMEZONE).format('MMM D, hh:mm A'),
       balance: currentBalance,
     })
 

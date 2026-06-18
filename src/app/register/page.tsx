@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Eye, EyeOff, TrendingUp, Loader2, CheckCircle2 } from 'lucide-react'
+import Image from 'next/image'
+import { Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 import { Suspense } from 'react'
 
 function RegisterForm() {
@@ -87,12 +88,8 @@ function RegisterForm() {
     <div className="w-full max-w-md fade-in">
       {/* Logo */}
       <div className="flex flex-col items-center mb-6">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center mb-3"
-             style={{ boxShadow: '0 0 25px rgba(59,130,246,0.4)' }}>
-          <TrendingUp className="w-7 h-7 text-white" />
-        </div>
-        <h1 className="text-2xl font-bold gradient-text">Onexe</h1>
-        <p className="text-gray-400 text-xs mt-1">Create your trading account</p>
+        <Image src="/ONEXE-logo.png" alt="Onexe" width={180} height={60} className="object-contain" />
+        <p className="text-gray-400 text-xs mt-2">Create your trading account</p>
       </div>
 
       <div className="glass-card p-6 sm:p-8">
