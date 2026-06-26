@@ -53,6 +53,15 @@ model BalanceHistory {
   user User @relation(fields: [userId], references: [id])
 }
 
+model OtpToken {
+  id        String   @id @default(cuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
 model GlobalSettings {
   id                  String  @id @default(cuid())
   taxEnabled          Boolean @default(false)

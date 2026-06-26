@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu, X, LogOut, LayoutDashboard, ArrowLeftRight, User, Shield, Lock } from 'lucide-react'
+import { Menu, X, LogOut, LayoutDashboard, ArrowLeftRight, User } from 'lucide-react'
 import type { JWTPayload } from '@/lib/auth'
 
 interface Props {
@@ -56,18 +56,6 @@ export default function DashboardNav({ user }: Props) {
               <span className="text-xs font-mono font-semibold text-blue-400">{user.userId}</span>
             </div>
 
-            <Link href="/terms" target="_blank"
-              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-all">
-              <Shield className="w-4 h-4" />
-              Terms
-            </Link>
-
-            <Link href="/privacy" target="_blank"
-              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-violet-400 hover:bg-violet-500/10 transition-all">
-              <Lock className="w-4 h-4" />
-              Privacy
-            </Link>
-
             <button onClick={logout}
               className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
               <LogOut className="w-4 h-4" />
@@ -97,18 +85,6 @@ export default function DashboardNav({ user }: Props) {
               <span className="text-xs text-gray-500">User ID: </span>
               <span className="text-xs font-mono text-blue-400">{user.userId}</span>
             </div>
-            <Link href="/terms" target="_blank"
-              className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-gray-300 hover:text-blue-400 hover:bg-blue-500/10"
-              onClick={() => setMenuOpen(false)}>
-              <Shield className="w-4 h-4" />
-              Terms & Conditions
-            </Link>
-            <Link href="/privacy" target="_blank"
-              className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-gray-300 hover:text-violet-400 hover:bg-violet-500/10"
-              onClick={() => setMenuOpen(false)}>
-              <Lock className="w-4 h-4" />
-              Privacy Policy
-            </Link>
             <button onClick={logout}
               className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 w-full">
               <LogOut className="w-4 h-4" />

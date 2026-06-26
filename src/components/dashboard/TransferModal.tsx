@@ -133,7 +133,8 @@ export default function TransferModal({ walletBalance, onClose, onSuccess }: Pro
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">₹</span>
                   <input
                     type="number"
-                    className="input-dark pl-9"
+                    className="input-dark"
+                    style={{ paddingLeft: '2rem' }}
                     placeholder="500"
                     min={500}
                     max={maxTransferable}

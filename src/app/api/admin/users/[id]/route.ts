@@ -16,7 +16,7 @@ export async function PATCH(
     const body = await req.json()
     const { status } = body
 
-    if (!['approved', 'rejected', 'pending'].includes(status)) {
+    if (!['approved', 'rejected', 'pending', 'inactive'].includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
 

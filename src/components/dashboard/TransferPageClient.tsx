@@ -127,7 +127,7 @@ export default function TransferPageClient({ user, transfers }: Props) {
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Amount</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
-                    <input type="number" className="input-dark pl-9" placeholder="500"
+                    <input type="number" className="input-dark" style={{ paddingLeft: '2rem' }} placeholder="500"
                       min={500} max={maxTransferable} step="0.001"
                       value={form.amount}
                       onChange={(e) => setForm({ ...form, amount: e.target.value })} />

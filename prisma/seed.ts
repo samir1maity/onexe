@@ -11,7 +11,7 @@ async function main() {
     update: {},
     create: {
       userId: 'ONXE000001',
-      name: 'Admin User',
+      name: 'Raj',
       email: 'admin@onexe.com',
       password: hashed,
       referralCode: 'ADMINREF1',
