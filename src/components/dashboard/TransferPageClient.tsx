@@ -27,12 +27,14 @@ export default function TransferPageClient({ user, transfers }: Props) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
+  const maxTransferable = Math.max(0, user.walletBalance - 100)
+
   const handleTransfer = async () => {
     setError('')
     const amt = parseFloat(form.amount)
-    if (!form.receiverUserId) { setError('Enter receiver referral ID'); return }
+    if (!form.receiverUserId) { setError('Enter receiver User ID'); return }
     if (!amt || amt < 500) { setError('Minimum transfer amount is ₹500'); return }
-    if (amt > user.walletBalance) { setError('Insufficient balance'); return }
+    if (amt > maxTransferable) { setError(`Maximum transferable amount is ${formatCurrency(maxTransferable)} (₹100 must remain in wallet)`); return }
 
     setLoading(true)
     try {
@@ -115,27 +117,35 @@ export default function TransferPageClient({ user, transfers }: Props) {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Receiver Referral ID</label>
-                  <input type="text" className="input-dark" placeholder="Enter receiver's referral code"
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Receiver User ID</label>
+                  <input type="text" className="input-dark" placeholder="e.g. ONXE123456"
                     value={form.receiverUserId}
-                    onChange={(e) => setForm({ ...form, receiverUserId: e.target.value })} />
+                    onChange={(e) => setForm({ ...form, receiverUserId: e.target.value.toUpperCase() })} />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Amount</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
-                    <input type="number" className="input-dark pl-7" placeholder="500.000"
-                      min={500} max={user.walletBalance} step="0.001"
+                    <input type="number" className="input-dark pl-9" placeholder="500"
+                      min={500} max={maxTransferable} step="0.001"
                       value={form.amount}
                       onChange={(e) => setForm({ ...form, amount: e.target.value })} />
                   </div>
                   <div className="flex justify-between text-xs mt-1">
                     <span className="text-gray-500">Min: ₹500</span>
-                    <button className="text-blue-400 hover:text-blue-300"
-                      onClick={() => setForm({ ...form, amount: user.walletBalance.toString() })}>
-                      Max: {formatCurrency(user.walletBalance)}
-                    </button>
+                    <div className="relative group flex items-center gap-1">
+                      <button className="text-blue-400 hover:text-blue-300"
+                        onClick={() => setForm({ ...form, amount: maxTransferable.toString() })}>
+                        Max: {formatCurrency(maxTransferable)}
+                      </button>
+                      <span className="text-gray-600 cursor-help">ⓘ</span>
+                      <div className="absolute bottom-full right-0 mb-2 w-52 hidden group-hover:block z-10">
+                        <div className="glass-card px-3 py-2 text-xs text-gray-300 leading-relaxed">
+                          ₹100 is reserved and cannot be transferred. Your max transferable amount is wallet balance minus ₹100.
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

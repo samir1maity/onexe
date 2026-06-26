@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getAuthUser } from '@/lib/auth'
+import { formatCurrency } from '@/lib/utils'
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,12 +26,16 @@ export async function POST(req: NextRequest) {
     const sender = await prisma.user.findUnique({ where: { id: auth.id } })
     if (!sender) return NextResponse.json({ error: 'Sender not found' }, { status: 404 })
 
-    if (sender.walletBalance < transferAmount) {
-      return NextResponse.json({ error: 'Insufficient balance' }, { status: 400 })
+    const maxTransferable = sender.walletBalance - 100
+    if (maxTransferable <= 0) {
+      return NextResponse.json({ error: 'Insufficient balance — minimum ₹100 must remain in wallet' }, { status: 400 })
+    }
+    if (transferAmount > maxTransferable) {
+      return NextResponse.json({ error: `Maximum transferable amount is ${formatCurrency(maxTransferable)} (₹100 must remain in wallet)` }, { status: 400 })
     }
 
-    const receiver = await prisma.user.findUnique({ where: { referralCode: receiverUserId } })
-    if (!receiver) return NextResponse.json({ error: 'Receiver not found with that referral ID' }, { status: 404 })
+    const receiver = await prisma.user.findUnique({ where: { userId: receiverUserId } })
+    if (!receiver) return NextResponse.json({ error: 'Receiver not found with that User ID' }, { status: 404 })
 
     if (receiver.id === sender.id) {
       return NextResponse.json({ error: 'Cannot transfer to yourself' }, { status: 400 })

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu, X, LogOut, Users, DollarSign, Settings, LayoutDashboard } from 'lucide-react'
+import { Menu, X, LogOut, Users, IndianRupee, Settings, LayoutDashboard } from 'lucide-react'
 import type { JWTPayload } from '@/lib/auth'
 
 interface Props { user: JWTPayload }
@@ -22,7 +22,7 @@ export default function AdminNav({ user }: Props) {
   const links = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
     { href: '/admin/users', label: 'Users', icon: Users },
-    { href: '/admin/amount', label: 'Amounts', icon: DollarSign },
+    { href: '/admin/amount', label: 'Amounts', icon: IndianRupee },
     { href: '/admin/settings', label: 'Settings', icon: Settings },
   ]
 

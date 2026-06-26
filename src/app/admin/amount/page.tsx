@@ -8,6 +8,8 @@ export default async function AdminAmountPage() {
       id: true,
       userId: true,
       name: true,
+      email: true,
+      phone: true,
       walletBalance: true,
       graphBalance: true,
       createdAt: true,

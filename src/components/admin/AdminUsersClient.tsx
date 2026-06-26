@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, CheckCircle2, XCircle, Eye, Loader2, Users, ChevronDown, ChevronUp } from 'lucide-react'
+import { Search, CheckCircle2, XCircle, Eye, Loader2, Users, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 
 interface UserItem {
@@ -28,6 +28,8 @@ export default function AdminUsersClient({ users: initialUsers }: Props) {
   const [sortField, setSortField] = useState<'name' | 'createdAt' | 'walletBalance'>('createdAt')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 10
 
   const filtered = useMemo(() => {
     let result = users
@@ -49,6 +51,13 @@ export default function AdminUsersClient({ users: initialUsers }: Props) {
     })
     return result
   }, [users, search, statusFilter, sortField, sortDir])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
+  const handleFilterChange = (val: string) => { setStatusFilter(val); setPage(1) }
+  const handleSearch = (val: string) => { setSearch(val); setPage(1) }
 
   const updateStatus = async (userId: string, status: string) => {
     setLoading(userId)
@@ -119,7 +128,7 @@ export default function AdminUsersClient({ users: initialUsers }: Props) {
               className="input-dark pl-9 text-sm"
               placeholder="Search by User ID, name, email..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -131,7 +140,7 @@ export default function AdminUsersClient({ users: initialUsers }: Props) {
                     ? s === 'pending' ? 'badge-pending' : s === 'approved' ? 'badge-approved' : s === 'rejected' ? 'badge-rejected' : 'bg-blue-500/20 border border-blue-500/30 text-blue-400'
                     : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white'
                 }`}
-                onClick={() => setStatusFilter(s)}
+                onClick={() => handleFilterChange(s)}
               >
                 {s.charAt(0).toUpperCase() + s.slice(1)} ({counts[s]})
               </button>
@@ -165,7 +174,7 @@ export default function AdminUsersClient({ users: initialUsers }: Props) {
                       <p className="text-gray-400 text-sm">No users found</p>
                     </td>
                   </tr>
-                ) : filtered.map((u) => (
+                ) : paginated.map((u) => (
                   <tr key={u.id}
                     className={`border-b border-white/5 last:border-0 hover:bg-white/3 transition-colors ${selectedUser?.id === u.id ? 'bg-blue-500/5' : ''}`}>
                     <td className="p-4">
@@ -221,6 +230,52 @@ export default function AdminUsersClient({ users: initialUsers }: Props) {
               </tbody>
             </table>
           </div>
+
+          {totalPages > 1 && (
+            <div className="p-3 border-t border-white/5 flex items-center justify-between">
+              <p className="text-xs text-gray-500">
+                Page {currentPage} of {totalPages} &middot; {filtered.length} users
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                  .reduce<(number | '...')[]>((acc, p, i, arr) => {
+                    if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push('...')
+                    acc.push(p)
+                    return acc
+                  }, [])
+                  .map((p, i) =>
+                    p === '...' ? (
+                      <span key={`e-${i}`} className="px-1 text-gray-600 text-xs">…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
+                          currentPage === p ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'text-gray-400 hover:text-white hover:bg-white/10'
+                        }`}
+                        onClick={() => setPage(p as number)}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                <button
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* User Detail Panel */}

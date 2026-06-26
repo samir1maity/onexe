@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Percent, Gift, DollarSign, Loader2, CheckCircle2, AlertCircle, ToggleLeft, ToggleRight, Save } from 'lucide-react'
+import { toast } from 'sonner'
+import { Percent, Gift, IndianRupee, Loader2, ToggleLeft, ToggleRight, Save } from 'lucide-react'
 
 interface Settings {
   id: string
@@ -16,11 +17,9 @@ interface Props { settings: Settings }
 export default function AdminSettingsClient({ settings: initial }: Props) {
   const [settings, setSettings] = useState(initial)
   const [loading, setLoading] = useState(false)
-  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const save = async () => {
     setLoading(true)
-    setMsg(null)
     try {
       const res = await fetch('/api/admin/settings', {
         method: 'PATCH',
@@ -28,12 +27,11 @@ export default function AdminSettingsClient({ settings: initial }: Props) {
         body: JSON.stringify(settings),
       })
       const data = await res.json()
-      if (!res.ok) { setMsg({ type: 'error', text: data.error || 'Failed to save' }); return }
+      if (!res.ok) { toast.error(data.error || 'Failed to save'); return }
       setSettings(data.settings)
-      setMsg({ type: 'success', text: 'Settings saved successfully!' })
-      setTimeout(() => setMsg(null), 3000)
+      toast.success('Settings saved successfully!')
     } catch {
-      setMsg({ type: 'error', text: 'Network error' })
+      toast.error('Network error')
     } finally {
       setLoading(false)
     }
@@ -45,15 +43,6 @@ export default function AdminSettingsClient({ settings: initial }: Props) {
         <h1 className="text-2xl font-bold text-white">Platform Settings</h1>
         <p className="text-gray-400 text-sm mt-0.5">Configure global platform parameters</p>
       </div>
-
-      {msg && (
-        <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${
-          msg.type === 'success' ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'
-        }`}>
-          {msg.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-          {msg.text}
-        </div>
-      )}
 
       {/* Tax Settings */}
       <div className="glass-card p-6 space-y-5">
@@ -146,7 +135,7 @@ export default function AdminSettingsClient({ settings: initial }: Props) {
       <div className="glass-card p-6 space-y-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center">
-            <DollarSign className="w-5 h-5 text-blue-400" />
+            <IndianRupee className="w-5 h-5 text-blue-400" />
           </div>
           <div>
             <h2 className="font-semibold text-white">Registration Bonus</h2>

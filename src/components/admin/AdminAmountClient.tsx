@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { User, Users, Calendar, DollarSign, Loader2, CheckCircle2, AlertCircle, Plus, Minus } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { User, Users, IndianRupee, Loader2, CheckCircle2, AlertCircle, Plus, Minus, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 
 interface UserItem {
   id: string
   userId: string
   name: string
+  email: string
+  phone?: string | null
   walletBalance: number
   graphBalance: number
   createdAt: string
@@ -15,29 +17,19 @@ interface UserItem {
 
 interface Props { users: UserItem[] }
 
+const PAGE_SIZE = 10
+
 export default function AdminAmountClient({ users }: Props) {
   const [tab, setTab] = useState<'single' | 'all'>('all')
   const [selectedUserId, setSelectedUserId] = useState('')
   const [amount, setAmount] = useState('')
   const [isDeduct, setIsDeduct] = useState(false)
-  const [date, setDate] = useState('')
-  const [dateCount, setDateCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
-  const [checkingDate, setCheckingDate] = useState(false)
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-
-  const handleDateChange = async (d: string) => {
-    setDate(d)
-    if (!d) { setDateCount(null); return }
-    setCheckingDate(true)
-    try {
-      const res = await fetch(`/api/admin/amount?date=${d}`)
-      const data = await res.json()
-      setDateCount(data.count)
-    } finally {
-      setCheckingDate(false)
-    }
-  }
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [singleSearch, setSingleSearch] = useState('')
+  const [showDropdown, setShowDropdown] = useState(false)
 
   const handleSubmit = async () => {
     const amt = parseFloat(amount)
@@ -50,7 +42,7 @@ export default function AdminAmountClient({ users }: Props) {
       const finalAmt = isDeduct ? -Math.abs(amt) : Math.abs(amt)
       const body = tab === 'single'
         ? { type: 'single', userId: selectedUserId, amount: finalAmt }
-        : { type: 'all', amount: finalAmt, date: date || undefined }
+        : { type: 'all', amount: finalAmt }
 
       const res = await fetch('/api/admin/amount', {
         method: 'POST',
@@ -70,6 +62,30 @@ export default function AdminAmountClient({ users }: Props) {
   }
 
   const selectedUser = users.find((u) => u.id === selectedUserId)
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return users
+    return users.filter((u) =>
+      u.name.toLowerCase().includes(q) || u.userId.toLowerCase().includes(q)
+    )
+  }, [users, search])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
+  const handleSearch = (q: string) => { setSearch(q); setPage(1) }
+
+  const singleFiltered = useMemo(() => {
+    const q = singleSearch.trim().toLowerCase()
+    if (!q) return users
+    return users.filter((u) =>
+      u.userId.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      (u.phone && u.phone.includes(q))
+    )
+  }, [users, singleSearch])
 
   return (
     <div className="space-y-5 fade-in">
@@ -108,52 +124,56 @@ export default function AdminAmountClient({ users }: Props) {
             {tab === 'single' && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1.5">Select User</label>
-                <select
-                  className="input-dark text-sm"
-                  value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                >
-                  <option value="">Choose a user...</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id} style={{ background: '#111827' }}>
-                      {u.name} ({u.userId}) — {formatCurrency(u.walletBalance)}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+                  <input
+                    type="text"
+                    className="input-dark pl-9 text-sm"
+                    placeholder="Search by user ID, email or phone..."
+                    value={singleSearch}
+                    onChange={(e) => { setSingleSearch(e.target.value); setShowDropdown(true); setSelectedUserId('') }}
+                    onFocus={() => setShowDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+                  />
+                  {showDropdown && (
+                    <div className="absolute z-20 w-full mt-1 rounded-xl border border-white/10 overflow-hidden shadow-xl"
+                      style={{ background: '#0f1623' }}>
+                      {singleFiltered.length === 0 ? (
+                        <p className="px-3 py-2.5 text-xs text-gray-500">No users found</p>
+                      ) : singleFiltered.slice(0, 8).map((u) => (
+                        <button
+                          key={u.id}
+                          type="button"
+                          className={`w-full text-left px-3 py-2.5 text-sm hover:bg-white/5 transition-colors flex items-center justify-between gap-2 ${selectedUserId === u.id ? 'bg-blue-500/10' : ''}`}
+                          onMouseDown={() => {
+                            setSelectedUserId(u.id)
+                            setSingleSearch(`${u.name} (${u.userId})`)
+                            setShowDropdown(false)
+                          }}
+                        >
+                          <div>
+                            <p className="text-white font-medium">{u.name}</p>
+                            <p className="text-xs text-gray-500 font-mono">{u.userId}</p>
+                            <p className="text-xs text-gray-600">{u.email}{u.phone ? ` · ${u.phone}` : ''}</p>
+                          </div>
+                          <span className="text-xs text-gray-400 flex-shrink-0">{formatCurrency(u.walletBalance)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {selectedUser && (
                   <div className="mt-2 p-2.5 rounded-lg bg-white/3 border border-white/5 text-xs">
                     <p className="text-white font-medium">{selectedUser.name}</p>
                     <p className="text-gray-400">Wallet: {formatCurrency(selectedUser.walletBalance)}</p>
-                    <p className="text-xs text-gray-500 text-amber-400/70 mt-0.5">⚠ Individual updates do not affect the trading graph</p>
+                    <p className="text-amber-400/70 mt-0.5">⚠ Individual updates do not affect the trading graph</p>
                   </div>
                 )}
               </div>
             )}
 
             {tab === 'all' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                  Filter by Join Date (optional)
-                </label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                  <input type="date" className="input-dark pl-9 text-sm"
-                    value={date} onChange={(e) => handleDateChange(e.target.value)} />
-                </div>
-                {checkingDate && <p className="text-xs text-gray-500 mt-1">Checking...</p>}
-                {!checkingDate && date && (
-                  <p className="text-xs mt-1">
-                    {dateCount === 0
-                      ? <span className="text-yellow-400">No users joined on this date</span>
-                      : <span className="text-green-400">{dateCount} user{dateCount !== 1 ? 's' : ''} joined on this date</span>
-                    }
-                  </p>
-                )}
-                {!date && (
-                  <p className="text-xs text-gray-500 mt-1">Leave empty to update all {users.length} active users</p>
-                )}
-                <p className="text-xs text-green-400/70 mt-2">✓ Global updates will move the trading graph</p>
-              </div>
+              <p className="text-xs text-gray-500">This will apply to all {users.length} active users</p>
             )}
 
             {/* Add / Deduct Toggle */}
@@ -194,19 +214,32 @@ export default function AdminAmountClient({ users }: Props) {
               onClick={handleSubmit} disabled={loading}>
               {loading
                 ? <><Loader2 className="w-4 h-4 spinner" /> Processing...</>
-                : <><DollarSign className="w-4 h-4" />{isDeduct ? 'Deduct' : 'Add'} Amount</>
+                : <><IndianRupee className="w-4 h-4" />{isDeduct ? 'Deduct' : 'Add'} Amount</>
               }
             </button>
           </div>
         </div>
 
         {/* User List */}
-        <div className="lg:col-span-3 glass-card overflow-hidden">
-          <div className="p-4 border-b border-white/5">
-            <h2 className="font-semibold text-white">Active Users ({users.length})</h2>
-            <p className="text-xs text-gray-500 mt-0.5">All approved users and their balances</p>
+        <div className="lg:col-span-3 glass-card overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-white/5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-white">Active Users ({users.length})</h2>
+              <span className="text-xs text-gray-500">{filtered.length} result{filtered.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+              <input
+                type="text"
+                className="input-dark pl-9 text-sm py-2"
+                placeholder="Search by name or user ID..."
+                value={search}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
           </div>
-          <div className="overflow-x-auto">
+
+          <div className="overflow-x-auto flex-1">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/5">
@@ -217,11 +250,13 @@ export default function AdminAmountClient({ users }: Props) {
                 </tr>
               </thead>
               <tbody>
-                {users.length === 0 ? (
+                {paginated.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="text-center py-10 text-gray-400 text-sm">No active users</td>
+                    <td colSpan={4} className="text-center py-10 text-gray-400 text-sm">
+                      {search ? 'No users match your search' : 'No active users'}
+                    </td>
                   </tr>
-                ) : users.map((u) => (
+                ) : paginated.map((u) => (
                   <tr key={u.id}
                     className={`border-b border-white/5 last:border-0 hover:bg-white/3 transition-colors cursor-pointer ${tab === 'single' && selectedUserId === u.id ? 'bg-blue-500/5' : ''}`}
                     onClick={() => { if (tab === 'single') setSelectedUserId(u.id) }}>
@@ -244,6 +279,53 @@ export default function AdminAmountClient({ users }: Props) {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="p-3 border-t border-white/5 flex items-center justify-between">
+              <p className="text-xs text-gray-500">
+                Page {currentPage} of {totalPages}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                  .reduce<(number | '...')[]>((acc, p, i, arr) => {
+                    if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push('...')
+                    acc.push(p)
+                    return acc
+                  }, [])
+                  .map((p, i) =>
+                    p === '...' ? (
+                      <span key={`ellipsis-${i}`} className="px-1 text-gray-600 text-xs">…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
+                          currentPage === p ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'text-gray-400 hover:text-white hover:bg-white/10'
+                        }`}
+                        onClick={() => setPage(p as number)}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                <button
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

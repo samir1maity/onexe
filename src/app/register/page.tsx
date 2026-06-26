@@ -32,6 +32,7 @@ function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!agreed) { setError('Please accept Terms & Conditions'); return }
+    if (form.phone && form.phone.length !== 10) { setError('Phone number must be exactly 10 digits'); return }
     if (form.password !== form.confirmPassword) { setError('Passwords do not match'); return }
     if (form.password.length < 6) { setError('Password must be at least 6 characters'); return }
 
@@ -120,9 +121,11 @@ function RegisterForm() {
               <input
                 type="tel"
                 className="input-dark text-sm"
-                placeholder="+91 9999999999"
+                placeholder="10-digit number"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                maxLength={10}
+                inputMode="numeric"
+                onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
               />
             </div>
           </div>
@@ -199,9 +202,9 @@ function RegisterForm() {
             </div>
             <span className="text-xs text-gray-400">
               I accept the{' '}
-              <span className="text-blue-400">Terms & Conditions</span>{' '}
+              <Link href="/terms" target="_blank" className="text-blue-400 hover:text-blue-300 underline underline-offset-2">Terms & Conditions</Link>{' '}
               and{' '}
-              <span className="text-blue-400">Privacy Policy</span>
+              <Link href="/privacy" target="_blank" className="text-blue-400 hover:text-blue-300 underline underline-offset-2">Privacy Policy</Link>
             </span>
           </label>
 

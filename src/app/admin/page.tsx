@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { Users, UserCheck, UserX, Clock, TrendingUp, DollarSign } from 'lucide-react'
+import { Users, UserCheck, UserX, Clock, TrendingUp, IndianRupee } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -27,7 +27,7 @@ export default async function AdminPage() {
     { label: 'Active Users', value: approvedUsers, icon: UserCheck, color: 'green', sub: 'Approved accounts' },
     { label: 'Rejected', value: rejectedUsers, icon: UserX, color: 'red', sub: 'Rejected accounts' },
     { label: 'Total Transfers', value: totalTransfers._count, icon: TrendingUp, color: 'violet', sub: 'All time' },
-    { label: 'Transfer Volume', value: formatCurrency(totalTransfers._sum.amount || 0), icon: DollarSign, color: 'emerald', sub: 'All time', isText: true },
+    { label: 'Transfer Volume', value: formatCurrency(totalTransfers._sum.amount || 0), icon: IndianRupee, color: 'emerald', sub: 'All time', isText: true },
   ]
 
   const colorMap: Record<string, string> = {
